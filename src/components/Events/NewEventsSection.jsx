@@ -19,7 +19,11 @@ export default function NewEventsSection() {
     // queryKey는 배열이며, 첫 번째 요소는 쿼리의 이름이다.
     queryKey: ['events' ],
     // queryFn은 Promise를 반환하는 함수이기만 하면 된다. Axios 등을 사용해도 무방.
-    queryFn: fetchEvents
+    queryFn: fetchEvents,
+    // staleTime은 이미 캐시된 데이터가 있을 때 새로운 요청을 전송하기 전까지 기다리는 시간(기본값은 0, 단위는 ms).
+    staleTime: 5000, // 5초가 지나면 새로운 요청을 보낸다.
+    // garbageCollectionTime은 캐시 만료까지 대기하는 시간이며 gcTime이 지나면 캐시는 폐기된다(기본값은 5분).
+    // gcTime: 30000 // 30초 동안 캐시를 유지한다.
   })
 
   let content;
