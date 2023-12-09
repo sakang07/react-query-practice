@@ -1,52 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import LoadingIndicator from '../UI/LoadingIndicator.jsx';
 import ErrorBlock from '../UI/ErrorBlock.jsx';
 import EventItem from './EventItem.jsx';
+import {fetchEvents} from "../../util/http.js";
 
 export default function NewEventsSection() {
-  const [data, setData] = useState();
-  const [error, setError] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  // useQuery는 쿼리를 수행하고, 쿼리의 상태를 추적하고, 캐시를 관리하는 React 커스텀 훅이다.
+  // data, isPending, isError 등의 상태를 반환한다.
 
-  useEffect(() => {
-    async function fetchEvents() {
-      setIsLoading(true);
-      const response = await fetch('http://localhost:3000/events');
+  // data는 쿼리가 성공적으로 완료되면 반환되는 데이터이다.
+  // isPending는 쿼리 진행 여부를 나타내며, 쿼리가 진행 중이면 true를 반환한다.
+  // isError는 쿼리가 실패하면 true를 반환한다.
+  // error는 쿼리가 실패하면 에러를 반환하는 코드가 있는 경우 발생한 에러에 대한 정보를 반환한다.
 
-      if (!response.ok) {
-        const error = new Error('An error occurred while fetching the events');
-        error.code = response.status;
-        error.info = await response.json();
-        throw error;
-      }
-
-      const { events } = await response.json();
-
-      return events;
-    }
-
-    fetchEvents()
-      .then((events) => {
-        setData(events);
-      })
-      .catch((error) => {
-        setError(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+  const { data, isPending, isError, error } = useQuery({
+    // 모든 HTTP 요청은 queryKey를 통해 고유하게 식별되어 캐시를 생성한다. 이로써 같은 요청이 여러 번 발생해도 캐시를 공유할 수 있다.
+    // queryKey는 배열이며, 첫 번째 요소는 쿼리의 이름이다.
+    queryKey: ['events' ],
+    // queryFn은 Promise를 반환하는 함수이기만 하면 된다. Axios 등을 사용해도 무방.
+    queryFn: fetchEvents
+  })
 
   let content;
 
-  if (isLoading) {
+  if (isPending) {
     content = <LoadingIndicator />;
   }
 
-  if (error) {
+  if (isError) {
     content = (
-      <ErrorBlock title="An error occurred" message="Failed to fetch events" />
+      <ErrorBlock
+        title="An error occurred"
+        message={error.info?.message || 'Failed to fetch events.'}
+      />
     );
   }
 
