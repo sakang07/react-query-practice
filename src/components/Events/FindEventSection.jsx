@@ -7,17 +7,23 @@ import EventItem from "./EventItem.jsx";
 
 export default function FindEventSection() {
   const searchElement = useRef();
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState()
 
-  const {data, isPending, isError, error} = useQuery({
+  // isLoading은 쿼리의 실행 여부를 나타내고,
+  // isPending은 쿼리 실행 여부와 관계없이 쿼리가 캐시를 사용하고 있는지 여부를 나타낸다.
+  // isPending은 enabled가 false인 경우에도 true를 반환한다.
+  // -> 최초 쿼리가 아직 실행되지 않고 있어도 로딩 스피너를 반환하는 오작동이 생김에 주의.
+  const {data, isLoading, isError, error} = useQuery({
     // queryKey에 동적인 값을 전달하여 같은 쿼리로 다른 데이터를 캐싱하거나 재사용할 수 있다.
     queryKey: ['events', {search: searchTerm}],
     queryFn: ({ signal }) => fetchEvents({ signal, searchTerm }), // submit시의 검색어를 url로 전달
+    // enabled가 false이면 쿼리가 실행되지 않는다. 기본값은 true.
+    enabled: searchTerm !== undefined, // 검색어가 없으면 쿼리를 실행하지 않는다.
   });
 
   let content = <p>Please enter a search term and to find events.</p>;
 
-  if (isPending) {
+  if (isLoading) {
     content = <LoadingIndicator/>;
   }
 
