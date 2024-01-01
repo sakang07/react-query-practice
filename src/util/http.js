@@ -1,3 +1,8 @@
+import {QueryClient} from "@tanstack/react-query";
+// queryClient는 쿼리를 관리하는 인스턴스이다. new QueryClient()로 생성한다.
+
+export const queryClient = new QueryClient();
+
 // fetch 함수에서 매개변수로 받는 값은 객체이다.
 // signal은 AbortController 객체의 signal 프로퍼티이다. 요청이 중단될 때 그 신호를 받는다.
 // 두 번째 인자는 호출부에서 넘긴 검색어를 받는다.
@@ -44,4 +49,19 @@ export async function createNewEvent(eventData) {
   const { event } = await response.json();
 
   return event;
+}
+
+export async function fetchSelectableImages({ signal }) {
+  const response = await fetch(`http://localhost:3000/events/images`, { signal });
+
+  if (!response.ok) {
+    const error = new Error('An error occurred while fetching the images');
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  const { images } = await response.json();
+
+  return images;
 }

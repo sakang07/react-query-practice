@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import Modal from '../UI/Modal.jsx';
 import EventForm from './EventForm.jsx';
-import { createNewEvent } from '../../util/http.js';
+import { createNewEvent, queryClient } from '../../util/http.js';
 import ErrorBlock from "../UI/ErrorBlock.jsx";
 
 export default function NewEvent() {
@@ -15,6 +15,13 @@ export default function NewEvent() {
   // useQuery와 마찬가지로 data, isPending, isError, error 등의 상태를 반환한다.
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: createNewEvent,
+    onSuccess: () => {
+      // 성공한 뒤에 실행할 콜백
+      // queryClent.invalidateQueries: 새로운 이벤트가 실행되었으므로 해당 키를 포함하고 있는 모든 캐시를 폐기하고 다시 쿼리를 실행한다.
+      // 이 때 쿼리 키가 완전히 동일할 필요는 없다. 해당 쿼리 키를 포함하기만 하면 모두 해당. exact 속성을 추가함으로써 정확히 타게팅 가능.
+      queryClient.invalidateQueries({queryKey: ['events']});
+      navigate('/events');
+    },
   });
   function handleSubmit(formData) {
     // 원하는 타이밍에 mutate를 호출하여 서버에 데이터를 보낸다.

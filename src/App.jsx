@@ -8,7 +8,8 @@ import Events from './components/Events/Events.jsx';
 import EventDetails from './components/Events/EventDetails.jsx';
 import NewEvent from './components/Events/NewEvent.jsx';
 import EditEvent from './components/Events/EditEvent.jsx';
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./util/http.js"; // queryClient를 이용하기 위해 http.js로 옮기고 import
 
 const router = createBrowserRouter([
   {
@@ -38,8 +39,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-// queryClient는 쿼리를 관리하는 인스턴스이다. new QueryClient()로 생성한다.
-const queryClient = new QueryClient();
 
 function App() {
   return (
